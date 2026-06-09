@@ -30,3 +30,22 @@
 *.exe
 *.out
 *.app
+
+# Build directories
+cmake-build-*/
+build/
+out/
+
+# CMake generated
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
+compile_commands.json
+Makefile
+
+# OS files
+.DS_Store
+Thumbs.db
+
+#Clion
+/.idea
