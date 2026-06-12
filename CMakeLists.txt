@@ -17,8 +17,6 @@ find_package(SDL2_mixer CONFIG REQUIRED)
 
 file(GLOB_RECURSE SOURCES
     src/*.cpp
-    src/*.h
-    src/*.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
