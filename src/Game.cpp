@@ -76,8 +76,8 @@ void Game::changeScene(Scene *scene) {
 void Game::clean() {
     if (currentScene != nullptr) {
         currentScene->clean();
-        delete currentScene;
         currentScene = nullptr;
+        delete currentScene;
     }
     IMG_Quit();
     SDL_DestroyRenderer(renderer);

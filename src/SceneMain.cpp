@@ -16,11 +16,22 @@ SceneMain::~SceneMain() {
 
 void SceneMain::init() {
     player.texture = IMG_LoadTexture(game.getRenderer(), "assets/image/SpaceShip.png");
+    if (player.texture == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load player texture %s", SDL_GetError());
+    }
     SDL_QueryTexture(player.texture, NULL, NULL, &player.width, &player.height);
     player.width /= 4;
     player.height /= 4;
     player.position.x = game.getWindowWidth() / 2 - player.width / 2;
     player.position.y = game.getWindowHeight() - player.height;
+
+    projectilePlayerTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/image/laser-1.png");
+    if (projectilePlayerTemplate.texture == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load player projectile texture %s", SDL_GetError());
+    }
+    SDL_QueryTexture(projectilePlayerTemplate.texture, NULL, NULL, &projectilePlayerTemplate.width, &projectilePlayerTemplate.height);
+    projectilePlayerTemplate.width /= 4;
+    projectilePlayerTemplate.height /= 4;
 }
 
 void SceneMain::handleEvent(SDL_Event *event) {
@@ -28,18 +39,32 @@ void SceneMain::handleEvent(SDL_Event *event) {
 }
 
 void SceneMain::render() {
+    renderPlayerProjectiles();
+
     SDL_Rect playerRect = {static_cast<int>(player.position.x), static_cast<int>(player.position.y), player.width, player.height};
     SDL_RenderCopy(game.getRenderer(), player.texture, NULL, &playerRect);
 }
 
 void SceneMain::clean() {
+    for (auto &projectile : projectilePlayer) {
+        if (projectile != nullptr) {
+            projectile = nullptr;
+            delete projectile;
+        }
+
+    }
     if (player.texture != nullptr) {
         SDL_DestroyTexture(player.texture);
+    }
+
+    if (projectilePlayerTemplate.texture != nullptr) {
+        SDL_DestroyTexture(projectilePlayerTemplate.texture);
     }
 }
 
 void SceneMain::update(float deltaTime) {
     keyboardControl(deltaTime);
+    updatePlayerProjectiles(deltaTime);
 }
 
 void SceneMain::keyboardControl(float deltaTime) {
@@ -68,5 +93,42 @@ void SceneMain::keyboardControl(float deltaTime) {
     }
     if (player.position.y > game.getWindowHeight() - player.height) {
         player.position.y = game.getWindowHeight() - player.height;
+    }
+
+    if (keyboardState[SDL_SCANCODE_J]) {
+        auto currentTime = SDL_GetTicks();
+        if (currentTime - player.lastShootTime >player.coolDown) {
+            player.lastShootTime = currentTime;
+            shootPlayer();
+        }
+    }
+}
+
+void SceneMain::shootPlayer() {
+    auto projectile = new ProjectilePlayer(projectilePlayerTemplate);
+    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2;
+    projectile->position.y = player.position.y;
+    projectilePlayer.push_back(projectile);
+}
+
+void SceneMain::updatePlayerProjectiles(float deltaTime) {
+    int margin = 32;
+    for (auto it = projectilePlayer.begin(); it != projectilePlayer.end();) {
+        auto projectile = *it;
+        projectile->position.y -= projectile->speed * deltaTime;
+        if (projectile->position.y + margin < 0) {
+            delete projectile;
+            it = projectilePlayer.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+}
+
+void SceneMain::renderPlayerProjectiles() {
+    for (auto projectile: projectilePlayer) {
+        SDL_Rect projectileRect = {static_cast<int>(projectile->position.x), static_cast<int>(projectile->position.y), projectile->width, projectile->height};
+        SDL_RenderCopy(game.getRenderer(), projectile->texture, NULL, &projectileRect);
     }
 }

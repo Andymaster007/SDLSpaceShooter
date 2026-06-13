@@ -5,6 +5,8 @@
 #ifndef SDLSPACESHOOTER_SCENEMAIN_H
 #define SDLSPACESHOOTER_SCENEMAIN_H
 
+#include <list>
+
 #include "Scene.h"
 #include "Object.h"
 
@@ -21,9 +23,14 @@ public:
     void init() override;
     void clean() override;
     void keyboardControl(float deltaTime);
+    void shootPlayer();
+    void updatePlayerProjectiles(float deltaTime);
+    void renderPlayerProjectiles();
 private:
     Game &game;
     Player player;
+    ProjectilePlayer projectilePlayerTemplate;
+    std::list<ProjectilePlayer*> projectilePlayer;
 };
 
 

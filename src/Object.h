@@ -12,10 +12,18 @@ struct Player {
     SDL_FPoint position = {0, 0};
     int width = 0;
     int height = 0;
-    float speed = 300.0f;
+    int speed = 300;
+    Uint32 coolDown = 500;
+    Uint32 lastShootTime = 0;
 };
 
-
+struct ProjectilePlayer {
+    SDL_Texture *texture = nullptr;
+    SDL_FPoint position = {0, 0};
+    int width = 0;
+    int height = 0;
+    int speed = 600;
+};
 
 
 
