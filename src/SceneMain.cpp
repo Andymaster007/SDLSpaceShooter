@@ -38,23 +38,23 @@ void SceneMain::clean() {
     }
 }
 
-void SceneMain::update() {
-    keyboardControl();
+void SceneMain::update(float deltaTime) {
+    keyboardControl(deltaTime);
 }
 
-void SceneMain::keyboardControl() {
+void SceneMain::keyboardControl(float deltaTime) {
     auto keyboardState = SDL_GetKeyboardState(NULL);
     if (keyboardState[SDL_SCANCODE_W]) {
-        player.position.y -= 1;
+        player.position.y -= deltaTime * player.speed;
     }
     if (keyboardState[SDL_SCANCODE_S]) {
-        player.position.y += 1;
+        player.position.y += deltaTime * player.speed;
     }
     if (keyboardState[SDL_SCANCODE_A]) {
-        player.position.x -= 1;
+        player.position.x -= deltaTime * player.speed;
     }
     if (keyboardState[SDL_SCANCODE_D]) {
-        player.position.x += 1;
+        player.position.x += deltaTime * player.speed;
     }
 
     if (player.position.x < 0) {

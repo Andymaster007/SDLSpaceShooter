@@ -3,6 +3,10 @@
 //
 
 #include "Game.h"
+
+#include <iostream>
+#include <ostream>
+
 #include "SceneMain.h"
 #include <SDL_image.h>
 
@@ -15,6 +19,7 @@ Game::~Game() {
 }
 
 void Game::init() {
+    expectedFrameTime = 1000 / FPS;
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize SDL: %s\n", SDL_GetError());
         isRunning = false;
@@ -42,10 +47,20 @@ void Game::init() {
 
 void Game::run() {
     while (isRunning) {
+        auto frameStart = SDL_GetTicks();
         SDL_Event event;
         handleEvent(&event);
         update();
         render();
+        auto frameEnd = SDL_GetTicks();
+        auto frameTime = frameEnd - frameStart;
+        if (frameTime < expectedFrameTime) {
+            SDL_Delay(expectedFrameTime - frameTime);
+            deltaTime = expectedFrameTime / 1000.0f;
+        }
+        else {
+            deltaTime = frameTime / 1000.0f;
+        }
     }
 }
 
@@ -71,7 +86,7 @@ void Game::clean() {
 }
 
 void Game::update() {
-    currentScene->update();
+    currentScene->update(deltaTime);
 }
 
 void Game::render() {
