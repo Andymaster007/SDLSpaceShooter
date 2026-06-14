@@ -2,11 +2,8 @@
 // Created by Andy on 2026/6/10.
 //
 
-#include "Game.h"
-
 #include <iostream>
-#include <ostream>
-
+#include "Game.h"
 #include "SceneMain.h"
 #include <SDL_image.h>
 
