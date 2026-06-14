@@ -46,19 +46,21 @@ void SceneMain::render() {
 }
 
 void SceneMain::clean() {
-    for (auto &projectile : projectilePlayer) {
+    for (auto projectile : projectilePlayer) {
         if (projectile != nullptr) {
-            projectile = nullptr;
             delete projectile;
         }
-
     }
+    projectilePlayer.clear();
+
     if (player.texture != nullptr) {
         SDL_DestroyTexture(player.texture);
+        player.texture = nullptr;
     }
 
     if (projectilePlayerTemplate.texture != nullptr) {
         SDL_DestroyTexture(projectilePlayerTemplate.texture);
+        projectilePlayerTemplate.texture = nullptr;
     }
 }
 
