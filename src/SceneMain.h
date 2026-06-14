@@ -6,9 +6,9 @@
 #define SDLSPACESHOOTER_SCENEMAIN_H
 
 #include <list>
-
 #include "Scene.h"
 #include "Object.h"
+#include <random>
 
 class Game;
 
@@ -26,11 +26,18 @@ public:
     void shootPlayer();
     void updatePlayerProjectiles(float deltaTime);
     void renderPlayerProjectiles();
+    void spawnEnemy();
+    void updateEnemies(float deltaTime);
+    void renderEnemies();
 private:
     Game &game;
     Player player;
     ProjectilePlayer projectilePlayerTemplate;
     std::list<ProjectilePlayer*> projectilePlayer;
+    Enemy enemyTemplate;
+    std::list<Enemy*> enemies;
+    std::mt19937 gen;
+    std::uniform_real_distribution<float> dis;
 };
 
 

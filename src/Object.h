@@ -25,6 +25,14 @@ struct ProjectilePlayer {
     int speed = 600;
 };
 
+struct Enemy {
+    SDL_Texture *texture = nullptr;
+    SDL_FPoint position = {0, 0};
+    int width = 0;
+    int height = 0;
+    int speed = 200;
+};
+
 
 
 #endif //SDLSPACESHOOTER_OBJECT_H
