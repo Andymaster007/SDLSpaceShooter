@@ -12,8 +12,8 @@ struct Player {
     SDL_FPoint position = {0, 0};
     int width = 0;
     int height = 0;
-    int speed = 300;
-    Uint32 coolDown = 500;
+    int speed = 250;
+    Uint32 coolDown = 300;
     Uint32 lastShootTime = 0;
 };
 
@@ -22,7 +22,7 @@ struct ProjectilePlayer {
     SDL_FPoint position = {0, 0};
     int width = 0;
     int height = 0;
-    int speed = 600;
+    int speed = 500;
 };
 
 struct Enemy {
@@ -30,9 +30,18 @@ struct Enemy {
     SDL_FPoint position = {0, 0};
     int width = 0;
     int height = 0;
-    int speed = 200;
+    int speed = 150;
+    Uint32 coolDown = 1000;
+    Uint32 lastShootTime = 0;
 };
 
-
+struct ProjectileEnemy {
+    SDL_Texture *texture = nullptr;
+    SDL_FPoint position = {0, 0};
+    SDL_FPoint direction = {0, 0};
+    int width = 0;
+    int height = 0;
+    int speed = 300;
+};
 
 #endif //SDLSPACESHOOTER_OBJECT_H

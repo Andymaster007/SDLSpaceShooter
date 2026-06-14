@@ -29,6 +29,10 @@ public:
     void spawnEnemy();
     void updateEnemies(float deltaTime);
     void renderEnemies();
+    void shootEnemy(Enemy *enemy);
+    SDL_FPoint getDirection(Enemy *enemy);
+    void updateEnemyProjectiles(float deltaTime);
+    void renderEnemyProjectiles();
 private:
     Game &game;
     Player player;
@@ -36,6 +40,8 @@ private:
     std::list<ProjectilePlayer*> projectilePlayer;
     Enemy enemyTemplate;
     std::list<Enemy*> enemies;
+    ProjectileEnemy projectileEnemyTemplate;
+    std::list<ProjectileEnemy*> projectileEnemies;
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
 };
