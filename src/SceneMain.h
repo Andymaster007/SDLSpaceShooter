@@ -34,6 +34,7 @@ public:
     void updateEnemyProjectiles(float deltaTime);
     void renderEnemyProjectiles();
     void enemyExplode(Enemy *enemy);
+    void updatePlayer(float deltaTime);
 private:
     Game &game;
     Player player;
@@ -46,6 +47,7 @@ private:
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
     int scalingFactor = 4;
+    bool isDead = false;
 };
 
 
