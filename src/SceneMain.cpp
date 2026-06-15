@@ -24,8 +24,8 @@ void SceneMain::init() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load player texture %s", SDL_GetError());
     }
     SDL_QueryTexture(player.texture, NULL, NULL, &player.width, &player.height);
-    player.width /= 5;
-    player.height /= 5;
+    player.width /= scalingFactor;
+    player.height /= scalingFactor;
     player.position.x = game.getWindowWidth() / 2 - player.width / 2;
     player.position.y = game.getWindowHeight() - player.height;
 
@@ -34,21 +34,21 @@ void SceneMain::init() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load player projectile texture %s", SDL_GetError());
     }
     SDL_QueryTexture(projectilePlayerTemplate.texture, NULL, NULL, &projectilePlayerTemplate.width, &projectilePlayerTemplate.height);
-    projectilePlayerTemplate.width /= 5;
-    projectilePlayerTemplate.height /= 5;
+    projectilePlayerTemplate.width /= scalingFactor;
+    projectilePlayerTemplate.height /= scalingFactor;
 
     enemyTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/image/insect-2.png");
     SDL_QueryTexture(enemyTemplate.texture, NULL, NULL, &enemyTemplate.width, &enemyTemplate.height);
-    enemyTemplate.width /= 5;
-    enemyTemplate.height /= 5;
+    enemyTemplate.width /= scalingFactor;
+    enemyTemplate.height /= scalingFactor;
 
     projectileEnemyTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/image/bullet-1.png");
     if (projectileEnemyTemplate.texture == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load enemy projectile texture %s", SDL_GetError());
     }
     SDL_QueryTexture(projectileEnemyTemplate.texture, NULL, NULL, &projectileEnemyTemplate.width, &projectileEnemyTemplate.height);
-    projectileEnemyTemplate.width /= 5;
-    projectileEnemyTemplate.height /= 5;
+    projectileEnemyTemplate.width /= scalingFactor;
+    projectileEnemyTemplate.height /= scalingFactor;
 }
 
 void SceneMain::handleEvent(SDL_Event *event) {
@@ -251,6 +251,7 @@ void SceneMain::updateEnemyProjectiles(float deltaTime) {
 void SceneMain::renderEnemyProjectiles() {
     for (auto projectile: projectileEnemies) {
         SDL_Rect projectileRect = {static_cast<int>(projectile->position.x), static_cast<int>(projectile->position.y), projectile->width, projectile->height};
-        SDL_RenderCopy(game.getRenderer(), projectile->texture, NULL, &projectileRect);
+        float angle = atan(projectile->direction.y / projectile->direction.x) * 180 / M_PI - 90;
+        SDL_RenderCopyEx(game.getRenderer(), projectile->texture, NULL, &projectileRect, angle, NULL, SDL_FLIP_NONE);
     }
 }

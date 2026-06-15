@@ -44,6 +44,7 @@ private:
     std::list<ProjectileEnemy*> projectileEnemies;
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
+    int scalingFactor = 4;
 };
 
 
