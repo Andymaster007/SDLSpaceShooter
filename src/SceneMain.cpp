@@ -52,6 +52,14 @@ void SceneMain::init() {
     SDL_QueryTexture(projectileEnemyTemplate.texture, NULL, NULL, &projectileEnemyTemplate.width, &projectileEnemyTemplate.height);
     projectileEnemyTemplate.width /= scalingFactor;
     projectileEnemyTemplate.height /= scalingFactor;
+
+    explosionTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/effect/explosion.png");
+    if (explosionTemplate.texture == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load explosion texture %s", SDL_GetError());
+    }
+    SDL_QueryTexture(explosionTemplate.texture, NULL, NULL, &explosionTemplate.width, &explosionTemplate.height);
+    explosionTemplate.totalFrames = explosionTemplate.width / explosionTemplate.height;
+    explosionTemplate.width = explosionTemplate.height;
 }
 
 void SceneMain::handleEvent(SDL_Event *event) {
@@ -62,6 +70,7 @@ void SceneMain::render() {
     renderPlayerProjectiles();
     renderEnemyProjectiles();
     renderEnemies();
+    renderExplosions();
     if (!isDead) {
         SDL_Rect playerRect = {static_cast<int>(player.position.x), static_cast<int>(player.position.y), player.width, player.height};
         SDL_RenderCopy(game.getRenderer(), player.texture, NULL, &playerRect);
@@ -108,6 +117,18 @@ void SceneMain::clean() {
         SDL_DestroyTexture(projectileEnemyTemplate.texture);
         projectileEnemyTemplate.texture = nullptr;
     }
+
+    for (auto explosion: explosions) {
+        if (explosion != nullptr) {
+            delete explosion;
+        }
+    }
+    explosions.clear();
+
+    if (explosionTemplate.texture != nullptr) {
+        SDL_DestroyTexture(explosionTemplate.texture);
+        explosionTemplate.texture = nullptr;
+    }
 }
 
 void SceneMain::update(float deltaTime) {
@@ -116,7 +137,8 @@ void SceneMain::update(float deltaTime) {
     updateEnemyProjectiles(deltaTime);
     spawnEnemy();
     updateEnemies(deltaTime);
-    updatePlayer(deltaTime);
+    updatePlayer();
+    updateExplosions();
 }
 
 void SceneMain::keyboardControl(float deltaTime) {
@@ -298,15 +320,27 @@ void SceneMain::renderEnemyProjectiles() {
 }
 
 void SceneMain::enemyExplode(Enemy *enemy) {
+    auto currentTime = SDL_GetTicks();
+    auto explosion = new Explosion(explosionTemplate);
+    explosion->position.x = enemy->position.x + enemy->width / 2 - explosion->width / 2;
+    explosion->position.y = enemy->position.y + enemy->height / 2 - explosion->height / 2 + 15;
+    explosion->startTime = currentTime;
+    explosions.push_back(explosion);
     delete enemy;
 }
 
-void SceneMain::updatePlayer(float deltaTime) {
+void SceneMain::updatePlayer() {
     if (isDead) {
         return;
     }
     if (player.health <= 0) {
         isDead = true;
+        auto currentTime = SDL_GetTicks();
+        auto explosion = new Explosion(explosionTemplate);
+        explosion->position.x = player.position.x + player.width / 2 - explosion->width / 2;
+        explosion->position.y = player.position.y + player.height / 2 - explosion->height / 2 + 3;
+        explosion->startTime = currentTime;
+        explosions.push_back(explosion);
     }
     else {
         for (auto enemy: enemies) {
@@ -317,5 +351,28 @@ void SceneMain::updatePlayer(float deltaTime) {
                 enemy->health = 0;
             }
         }
+    }
+}
+
+void SceneMain::updateExplosions() {
+    auto currentTime = SDL_GetTicks();
+    for (auto it = explosions.begin(); it != explosions.end();) {
+        auto explosion = *it;
+        explosion->currentFrame = (currentTime - explosion->startTime) * explosion->FPS / 1000;
+        if (explosion->currentFrame >= explosion->totalFrames) {
+            delete explosion;
+            it = explosions.erase(it);
+        }
+        else {
+                ++it;
+        }
+    }
+}
+
+void SceneMain::renderExplosions() {
+    for (auto explosion: explosions) {
+        SDL_Rect explosionSrcrect = {explosion->currentFrame * explosion->width, 0, explosion->width, explosion->height};
+        SDL_Rect explosionDstrect = {static_cast<int>(explosion->position.x), static_cast<int>(explosion->position.y) , explosion->width, explosion->height};
+        SDL_RenderCopy(game.getRenderer(), explosion->texture, &explosionSrcrect, &explosionDstrect);
     }
 }

@@ -34,7 +34,9 @@ public:
     void updateEnemyProjectiles(float deltaTime);
     void renderEnemyProjectiles();
     void enemyExplode(Enemy *enemy);
-    void updatePlayer(float deltaTime);
+    void updatePlayer();
+    void updateExplosions();
+    void renderExplosions();
 private:
     Game &game;
     Player player;
