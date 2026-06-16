@@ -5,6 +5,9 @@
 #include "SceneMain.h"
 #include "Game.h"
 #include <SDL_image.h>
+#include <cmath>
+
+static constexpr float PI = 3.14159265358979323846f;
 
 SceneMain::SceneMain() : game(Game::getInstance()) {
 
@@ -254,7 +257,7 @@ SDL_FPoint SceneMain::getDirection(Enemy *enemy) {
     auto x = (player.position.x + player.width / 2) - (enemy->position.x + enemy->width / 2);
     auto y = (player.position.y + player.height / 2) - (enemy->position.y + enemy->height / 2);
     if (x != 0 || y != 0) {
-        auto length = sqrt(x * x + y * y);
+        auto length = std::sqrt(x * x + y * y);
         x /= length;
         y /= length;
     }
@@ -289,7 +292,7 @@ void SceneMain::updateEnemyProjectiles(float deltaTime) {
 void SceneMain::renderEnemyProjectiles() {
     for (auto projectile: projectileEnemies) {
         SDL_Rect projectileRect = {static_cast<int>(projectile->position.x), static_cast<int>(projectile->position.y), projectile->width, projectile->height};
-        float angle = atan(projectile->direction.y / projectile->direction.x) * 180 / M_PI - 90;
+        float angle = std::atan(projectile->direction.y / projectile->direction.x) * 180 / PI - 90;
         SDL_RenderCopyEx(game.getRenderer(), projectile->texture, NULL, &projectileRect, angle, NULL, SDL_FLIP_NONE);
     }
 }

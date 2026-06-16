@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.20)
 project(SDLSpaceShooter)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -21,11 +21,16 @@ file(GLOB_RECURSE SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME}
+            PRIVATE
+            SDL2::SDL2main)
+endif()
+
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE
-        SDL2::SDL2main
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_ttf::SDL2_ttf
-        SDL2_mixer::SDL2_mixer
+            PRIVATE
+            SDL2::SDL2
+            SDL2_image::SDL2_image
+            SDL2_ttf::SDL2_ttf
+            SDL2_mixer::SDL2_mixer
 )

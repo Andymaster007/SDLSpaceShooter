@@ -44,6 +44,8 @@ private:
     std::list<Enemy*> enemies;
     ProjectileEnemy projectileEnemyTemplate;
     std::list<ProjectileEnemy*> projectileEnemies;
+    Explosion explosionTemplate;
+    std::list<Explosion*> explosions;
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
     int scalingFactor = 4;
