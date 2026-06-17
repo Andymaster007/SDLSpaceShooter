@@ -350,7 +350,7 @@ void SceneMain::enemyExplode(Enemy *enemy) {
     explosion->position.y = enemy->position.y + enemy->height / 2 - explosion->height / 2 + 15;
     explosion->startTime = currentTime;
     explosions.push_back(explosion);
-    if (dis(gen) < 0.5f) {
+    if (dis(gen) < 0.25f) {
         dropItem(enemy);
     }
     delete enemy;
@@ -458,7 +458,6 @@ void SceneMain::updateItems(float deltaTime) {
 void SceneMain::playerGetItem(Item *item) {
     if (item->type == ItemType::Health && player.health < player.maxHealth) {
         player.health += 1;
-        std::cout << player.health << std::endl;
     }
 }
 
