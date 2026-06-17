@@ -37,6 +37,10 @@ public:
     void updatePlayer();
     void updateExplosions();
     void renderExplosions();
+    void dropItem(Enemy *enemy);
+    void updateItems(float deltaTime);
+    void playerGetItem(Item *item);
+    void renderItems();
 private:
     Game &game;
     Player player;
@@ -48,6 +52,8 @@ private:
     std::list<ProjectileEnemy*> projectileEnemies;
     Explosion explosionTemplate;
     std::list<Explosion*> explosions;
+    Item itemHealthTemplate;
+    std::list<Item*> items;
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
     int scalingFactor = 4;

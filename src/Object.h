@@ -7,6 +7,12 @@
 
 #include <SDL.h>
 
+enum class ItemType {
+    Health,
+    Shield,
+    Time
+};
+
 struct Player {
     SDL_Texture *texture = nullptr;
     SDL_FPoint position = {0, 0};
@@ -14,6 +20,7 @@ struct Player {
     int height = 0;
     int speed = 300;
     int health = 3;
+    int maxHealth = 3;
     Uint32 coolDown = 300;
     Uint32 lastShootTime = 0;
 };
@@ -57,6 +64,17 @@ struct Explosion {
     int totalFrames = 0;
     Uint32 startTime = 0;
     Uint32 FPS = 10;
+};
+
+struct Item {
+    SDL_Texture *texture = nullptr;
+    SDL_FPoint position = {0, 0};
+    SDL_FPoint direction = {0, 0};
+    int width = 0;
+    int height = 0;
+    int speed = 200;
+    int bounce = 3;
+    ItemType type = ItemType::Health;
 };
 
 #endif //SDLSPACESHOOTER_OBJECT_H
