@@ -2,12 +2,11 @@
 // Created by Andy on 2026/6/11.
 //
 
+#include <iostream>
 #include "SceneMain.h"
 #include "Game.h"
 #include <SDL_image.h>
 #include <cmath>
-#include <iostream>
-#include <ostream>
 
 static constexpr float PI = 3.14159265358979323846f;
 
@@ -20,6 +19,12 @@ SceneMain::~SceneMain() {
 }
 
 void SceneMain::init() {
+    music = Mix_LoadMUS("assets/music/03_Racing_Through_Asteroids_Loop.ogg");
+    if (music == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load music %s", Mix_GetError());
+    }
+    Mix_PlayMusic(music, -1);
+
     std::random_device rd;
     gen = std::mt19937(rd());
     dis = std::uniform_real_distribution<float>(0.0f, 1.0f);
@@ -151,6 +156,11 @@ void SceneMain::clean() {
     if (itemHealthTemplate.texture != nullptr) {
         SDL_DestroyTexture(itemHealthTemplate.texture);
         itemHealthTemplate.texture = nullptr;
+    }
+
+    if (music != nullptr) {
+        Mix_HaltMusic();
+        Mix_FreeMusic(music);
     }
 }
 

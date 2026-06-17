@@ -5,10 +5,11 @@
 #ifndef SDLSPACESHOOTER_SCENEMAIN_H
 #define SDLSPACESHOOTER_SCENEMAIN_H
 
-#include <list>
 #include "Scene.h"
 #include "Object.h"
+#include <list>
 #include <random>
+#include <SDL_mixer.h>
 
 class Game;
 
@@ -44,6 +45,8 @@ public:
 private:
     Game &game;
     Player player;
+    Mix_Music *music;
+
     ProjectilePlayer projectilePlayerTemplate;
     std::list<ProjectilePlayer*> projectilePlayer;
     Enemy enemyTemplate;
@@ -54,8 +57,10 @@ private:
     std::list<Explosion*> explosions;
     Item itemHealthTemplate;
     std::list<Item*> items;
+
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
+
     int scalingFactor = 4;
     bool isDead = false;
 };

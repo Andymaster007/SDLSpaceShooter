@@ -6,6 +6,8 @@
 #include "Game.h"
 #include "SceneMain.h"
 #include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 Game::Game() {
 
@@ -32,14 +34,27 @@ void Game::init() {
     if (renderer == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't create renderer: %s\n", SDL_GetError());
     }
-    currentScene = new SceneMain();
-    currentScene->init();
 
     if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize SDL_image: %s\n", IMG_GetError());
         isRunning = false;
     }
 
+    if (Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG) != (MIX_INIT_MP3 | MIX_INIT_OGG)) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize SDL_mixer: %s\n", Mix_GetError());
+        isRunning = false;
+    }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't open audio: %s\n", Mix_GetError());
+        isRunning = false;
+    }
+    Mix_AllocateChannels(32);
+    Mix_VolumeMusic(MIX_MAX_VOLUME);
+    Mix_Volume(-1, MIX_MAX_VOLUME);
+
+    currentScene = new SceneMain();
+    currentScene->init();
 }
 
 void Game::run() {
@@ -77,6 +92,8 @@ void Game::clean() {
         currentScene = nullptr;
     }
     IMG_Quit();
+    Mix_CloseAudio();
+    Mix_Quit();
     SDL_DestroyRenderer(renderer);
     renderer = nullptr;
     SDL_DestroyWindow(window);
