@@ -9,6 +9,8 @@
 #include "Object.h"
 #include <list>
 #include <random>
+#include <map>
+#include <string>
 #include <SDL_mixer.h>
 
 class Game;
@@ -57,6 +59,7 @@ private:
     std::list<Explosion*> explosions;
     Item itemHealthTemplate;
     std::list<Item*> items;
+    std::map<std::string,Mix_Chunk*> soundEffects;
 
     std::mt19937 gen;
     std::uniform_real_distribution<float> dis;
