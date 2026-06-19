@@ -21,7 +21,7 @@ struct Player {
     int speed = 300;
     int health = 3;
     int maxHealth = 3;
-    Uint32 coolDown = 300;
+    Uint32 coolDown = 200;
     Uint32 lastShootTime = 0;
 };
 
@@ -75,6 +75,15 @@ struct Item {
     int speed = 200;
     int bounce = 3;
     ItemType type = ItemType::Health;
+};
+
+struct Background {
+    SDL_Texture *texture = nullptr;
+    SDL_FPoint position = {0, 0};
+    int width = 0;
+    int height = 0;
+    int speed = 30;
+    float offset = 0.0;
 };
 
 #endif //SDLSPACESHOOTER_OBJECT_H

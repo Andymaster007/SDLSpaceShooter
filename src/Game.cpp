@@ -50,8 +50,24 @@ void Game::init() {
         isRunning = false;
     }
     Mix_AllocateChannels(32);
-    Mix_VolumeMusic(MIX_MAX_VOLUME);
-    Mix_Volume(-1, MIX_MAX_VOLUME);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
+    Mix_Volume(-1, MIX_MAX_VOLUME / 8);
+
+    nearStars.texture = IMG_LoadTexture(renderer, "assets/image/Stars-A.png");
+    if (nearStars.texture == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load near star texture %s", SDL_GetError());
+    }
+    SDL_QueryTexture(nearStars.texture, NULL, NULL, &nearStars.width, &nearStars.height);
+    nearStars.width /= 2;
+    nearStars.height /= 2;
+    farStars.texture = IMG_LoadTexture(renderer, "assets/image/Stars-B.png");
+    if (farStars.texture == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load far star texture %s", SDL_GetError());
+    }
+    SDL_QueryTexture(farStars.texture, NULL, NULL, &farStars.width, &farStars.height);
+    farStars.speed = 20;
+    farStars.width /= 2;
+    farStars.height /= 2;
 
     currentScene = new SceneMain();
     currentScene->init();
@@ -91,6 +107,14 @@ void Game::clean() {
         delete currentScene;
         currentScene = nullptr;
     }
+    if (nearStars.texture != nullptr) {
+        SDL_DestroyTexture(nearStars.texture);
+        nearStars.texture = nullptr;
+    }
+    if (farStars.texture != nullptr) {
+        SDL_DestroyTexture(farStars.texture);
+        farStars.texture = nullptr;
+    }
     IMG_Quit();
     Mix_CloseAudio();
     Mix_Quit();
@@ -102,11 +126,13 @@ void Game::clean() {
 }
 
 void Game::update() {
+    updateBackground(deltaTime);
     currentScene->update(deltaTime);
 }
 
 void Game::render() {
     SDL_RenderClear(renderer);
+    renderBackground();
     currentScene->render();
     SDL_RenderPresent(renderer);
 }
@@ -134,4 +160,32 @@ int Game::getWindowWidth() {
 
 int Game::getWindowHeight() {
     return windowHeight;
+}
+
+void Game::updateBackground(float deltaTime) {
+    nearStars.offset += nearStars.speed * deltaTime;
+    if (nearStars.offset > 0.0) {
+        nearStars.offset -= nearStars.height;
+    }
+
+    farStars.offset += farStars.speed * deltaTime;
+    if (farStars.offset > 0.0) {
+        farStars.offset -= farStars.height;
+    }
+}
+
+void Game::renderBackground() {
+    for (int posY = static_cast<int>(farStars.offset); posY < getWindowHeight(); posY += farStars.height) {
+        for (int posX = 0; posX < getWindowWidth(); posX += farStars.width) {
+            SDL_Rect dstrect = {posX, posY, farStars.width, farStars.height};
+            SDL_RenderCopy(renderer, farStars.texture, NULL, &dstrect);
+        }
+    }
+
+    for (int posY = static_cast<int>(nearStars.offset); posY < getWindowHeight(); posY += nearStars.height) {
+        for (int posX = 0; posX < getWindowWidth(); posX += nearStars.width) {
+            SDL_Rect dstrect = {posX, posY, nearStars.width, nearStars.height};
+            SDL_RenderCopy(renderer, nearStars.texture, NULL, &dstrect);
+        }
+    }
 }

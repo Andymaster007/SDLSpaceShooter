@@ -6,6 +6,7 @@
 #define SDLSPACESHOOTER_GAME_H
 
 #include "Scene.h"
+#include "Object.h"
 
 
 class Game {
@@ -26,6 +27,8 @@ public:
     SDL_Renderer *getRenderer();
     int getWindowWidth();
     int getWindowHeight();
+    void updateBackground(float deltaTime);
+    void renderBackground();
 
 private:
     Game();
@@ -40,6 +43,8 @@ private:
     int FPS = 60;
     Uint32 expectedFrameTime;
     float deltaTime;
+    Background nearStars;
+    Background farStars;
 };
 
 
