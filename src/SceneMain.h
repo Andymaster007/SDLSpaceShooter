@@ -44,10 +44,12 @@ public:
     void updateItems(float deltaTime);
     void playerGetItem(Item *item);
     void renderItems();
+    void renderUI();
 private:
     Game &game;
     Player player;
     Mix_Music *music;
+    SDL_Texture *uiHealth;
 
     ProjectilePlayer projectilePlayerTemplate;
     std::list<ProjectilePlayer*> projectilePlayer;

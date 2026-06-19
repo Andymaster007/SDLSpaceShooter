@@ -81,6 +81,11 @@ void SceneMain::init() {
     SDL_QueryTexture(itemHealthTemplate.texture, NULL, NULL, &itemHealthTemplate.width, &itemHealthTemplate.height);
     itemHealthTemplate.width /= scalingFactor;
     itemHealthTemplate.height /= scalingFactor;
+
+    uiHealth = IMG_LoadTexture(game.getRenderer(), "assets/image/Health UI Black.png");
+    if (uiHealth == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load ui health %s", SDL_GetError());
+    }
 }
 
 void SceneMain::handleEvent(SDL_Event *event) {
@@ -93,6 +98,7 @@ void SceneMain::render() {
     renderEnemies();
     renderItems();
     renderExplosions();
+    renderUI();
     if (!isDead) {
         SDL_Rect playerRect = {static_cast<int>(player.position.x), static_cast<int>(player.position.y), player.width, player.height};
         SDL_RenderCopy(game.getRenderer(), player.texture, NULL, &playerRect);
@@ -176,6 +182,11 @@ void SceneMain::clean() {
         }
     }
     soundEffects.clear();
+
+    if (uiHealth != nullptr) {
+        SDL_DestroyTexture(uiHealth);
+        uiHealth = nullptr;
+    }
 }
 
 void SceneMain::update(float deltaTime) {
@@ -497,5 +508,22 @@ void SceneMain::renderItems() {
     for (auto item: items) {
         SDL_Rect itemRect = {static_cast<int>(item->position.x), static_cast<int>(item->position.y), item->width, item->height};
         SDL_RenderCopy(game.getRenderer(), item->texture, NULL, &itemRect);
+    }
+}
+
+void SceneMain::renderUI() {
+    int x = 15;
+    int y = 15;
+    int size = 48;
+    int offset = 60;
+    SDL_SetTextureColorMod(uiHealth, 100, 100, 100);
+    for (int i = 0; i < player.maxHealth; i++) {
+        SDL_Rect rect = {x + i * offset, y, size, size};
+        SDL_RenderCopy(game.getRenderer(), uiHealth, NULL, &rect);
+    }
+    SDL_SetTextureColorMod(uiHealth, 255, 255, 255);
+    for (int i = 0; i < player.health; i++) {
+        SDL_Rect rect = {x + i * offset, y, size, size};
+        SDL_RenderCopy(game.getRenderer(), uiHealth, NULL, &rect);
     }
 }
