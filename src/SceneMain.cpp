@@ -88,6 +88,8 @@ void SceneMain::init() {
     }
 
     scoreFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 30);
+
+    gameStart = SDL_GetTicks();
 }
 
 void SceneMain::handleEvent(SDL_Event *event) {
@@ -295,7 +297,18 @@ void SceneMain::spawnEnemy() {
     if (isDead) {
         return;
     }
-    if (dis(gen) < 1 / 60.0f) {
+    float spawnRate = 1.0;
+    if (SDL_GetTicks() - gameStart > 60000) {
+        spawnRate = 2.5;
+    }
+    else if (SDL_GetTicks() - gameStart > 40000) {
+        spawnRate = 2.0;
+    }
+    else if (SDL_GetTicks() - gameStart > 25000) {
+        spawnRate = 1.5;
+    }
+    std::cout << spawnRate << std::endl;
+    if (dis(gen) < spawnRate / 60.0f) {
         Enemy *enemy = new Enemy(enemyTemplate);
         enemy->position.x = dis(gen) * (game.getWindowWidth() - enemy->width);
         enemy->position.y = -enemy->height;
@@ -398,7 +411,7 @@ void SceneMain::enemyExplode(Enemy *enemy) {
     explosion->startTime = currentTime;
     explosions.push_back(explosion);
     Mix_PlayChannel(-1, soundEffects["enemyExplode"], 0);
-    if (dis(gen) < 0.25f) {
+    if (dis(gen) < 0.15f) {
         dropItem(enemy);
     }
     delete enemy;

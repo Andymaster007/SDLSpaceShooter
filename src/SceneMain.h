@@ -70,6 +70,7 @@ private:
 
     int scalingFactor = 4;
     bool isDead = false;
+    Uint32 gameStart = 0;
 };
 
 
