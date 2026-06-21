@@ -23,6 +23,7 @@ struct Player {
     int maxHealth = 3;
     Uint32 coolDown = 200;
     Uint32 lastShootTime = 0;
+    int score = 0;
 };
 
 struct ProjectilePlayer {

@@ -69,6 +69,11 @@ void Game::init() {
     farStars.width /= 2;
     farStars.height /= 2;
 
+    if (TTF_Init() == -1) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize TTF: %s\n", SDL_GetError());
+        isRunning = false;
+    }
+
     currentScene = new SceneMain();
     currentScene->init();
 }
@@ -118,6 +123,7 @@ void Game::clean() {
     IMG_Quit();
     Mix_CloseAudio();
     Mix_Quit();
+    TTF_Quit();
     SDL_DestroyRenderer(renderer);
     renderer = nullptr;
     SDL_DestroyWindow(window);

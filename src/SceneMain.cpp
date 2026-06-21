@@ -86,6 +86,8 @@ void SceneMain::init() {
     if (uiHealth == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load ui health %s", SDL_GetError());
     }
+
+    scoreFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 30);
 }
 
 void SceneMain::handleEvent(SDL_Event *event) {
@@ -186,6 +188,11 @@ void SceneMain::clean() {
     if (uiHealth != nullptr) {
         SDL_DestroyTexture(uiHealth);
         uiHealth = nullptr;
+    }
+
+    if (scoreFont != nullptr) {
+        TTF_CloseFont(scoreFont);
+        scoreFont = nullptr;
     }
 }
 
@@ -311,6 +318,7 @@ void SceneMain::updateEnemies(float deltaTime) {
                 enemy->lastShootTime = currentTime;
             }
             if (enemy->health <= 0) {
+                player.score += 10;
                 enemyExplode(enemy);
                 it = enemies.erase(it);
             }
@@ -526,4 +534,13 @@ void SceneMain::renderUI() {
         SDL_Rect rect = {x + i * offset, y, size, size};
         SDL_RenderCopy(game.getRenderer(), uiHealth, NULL, &rect);
     }
+
+    auto scoreTxt = "Score: " + std::to_string(player.score);
+    SDL_Color scoreColor = {255, 255, 255};
+    SDL_Surface *scoreSurface = TTF_RenderUTF8_Blended(scoreFont, scoreTxt.c_str(), scoreColor);
+    SDL_Texture *scoreTexture = SDL_CreateTextureFromSurface(game.getRenderer(), scoreSurface);
+    SDL_Rect scoreRect = {game.getWindowWidth() - scoreSurface->w - 25, 23, scoreSurface->w, scoreSurface->h};
+    SDL_RenderCopy(game.getRenderer(), scoreTexture, NULL, &scoreRect);
+    SDL_FreeSurface(scoreSurface);
+    SDL_DestroyTexture(scoreTexture);
 }

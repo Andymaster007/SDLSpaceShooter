@@ -12,6 +12,7 @@
 #include <map>
 #include <string>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 
 class Game;
 
@@ -50,6 +51,7 @@ private:
     Player player;
     Mix_Music *music;
     SDL_Texture *uiHealth;
+    TTF_Font *scoreFont;
 
     ProjectilePlayer projectilePlayerTemplate;
     std::list<ProjectilePlayer*> projectilePlayer;
