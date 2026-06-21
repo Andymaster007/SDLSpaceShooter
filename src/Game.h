@@ -7,7 +7,8 @@
 
 #include "Scene.h"
 #include "Object.h"
-
+#include <SDL_ttf.h>
+#include <string>
 
 class Game {
 public:
@@ -29,6 +30,7 @@ public:
     int getWindowHeight();
     void updateBackground(float deltaTime);
     void renderBackground();
+    void renderTextCentered(std::string text, float posY, bool isTitle);
 
 private:
     Game();
@@ -45,6 +47,8 @@ private:
     float deltaTime;
     Background nearStars;
     Background farStars;
+    TTF_Font *titleFont;
+    TTF_Font *textFont;
 };
 
 

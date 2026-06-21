@@ -4,19 +4,12 @@
 
 #include <iostream>
 #include "SceneMain.h"
+#include "SceneTitle.h"
 #include "Game.h"
 #include <SDL_image.h>
 #include <cmath>
 
 static constexpr float PI = 3.14159265358979323846f;
-
-SceneMain::SceneMain() : game(Game::getInstance()) {
-
-}
-
-SceneMain::~SceneMain() {
-
-}
 
 void SceneMain::init() {
     music = Mix_LoadMUS("assets/music/03_Racing_Through_Asteroids_Loop.ogg");
@@ -87,13 +80,18 @@ void SceneMain::init() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load ui health %s", SDL_GetError());
     }
 
-    scoreFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 30);
+    scoreFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 32);
 
     gameStart = SDL_GetTicks();
 }
 
 void SceneMain::handleEvent(SDL_Event *event) {
-
+    if (event->type == SDL_KEYDOWN) {
+        if (event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+            auto sceneTitle = new SceneTitle();
+            game.changeScene(sceneTitle);
+        }
+    }
 }
 
 void SceneMain::render() {
@@ -307,7 +305,6 @@ void SceneMain::spawnEnemy() {
     else if (SDL_GetTicks() - gameStart > 25000) {
         spawnRate = 1.5;
     }
-    std::cout << spawnRate << std::endl;
     if (dis(gen) < spawnRate / 60.0f) {
         Enemy *enemy = new Enemy(enemyTemplate);
         enemy->position.x = dis(gen) * (game.getWindowWidth() - enemy->width);

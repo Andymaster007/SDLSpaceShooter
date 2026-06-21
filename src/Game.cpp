@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Game.h"
 #include "SceneMain.h"
+#include "SceneTitle.h"
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
@@ -56,6 +57,7 @@ void Game::init() {
     nearStars.texture = IMG_LoadTexture(renderer, "assets/image/Stars-A.png");
     if (nearStars.texture == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load near star texture %s", SDL_GetError());
+        isRunning = false;
     }
     SDL_QueryTexture(nearStars.texture, NULL, NULL, &nearStars.width, &nearStars.height);
     nearStars.width /= 2;
@@ -63,6 +65,7 @@ void Game::init() {
     farStars.texture = IMG_LoadTexture(renderer, "assets/image/Stars-B.png");
     if (farStars.texture == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load far star texture %s", SDL_GetError());
+        isRunning = false;
     }
     SDL_QueryTexture(farStars.texture, NULL, NULL, &farStars.width, &farStars.height);
     farStars.speed = 20;
@@ -74,7 +77,14 @@ void Game::init() {
         isRunning = false;
     }
 
-    currentScene = new SceneMain();
+    titleFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 64);
+    textFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 32);
+    if (titleFont == nullptr || textFont == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't load font: %s\n", SDL_GetError());
+        isRunning = false;
+    }
+
+    currentScene = new SceneTitle();
     currentScene->init();
 }
 
@@ -119,6 +129,14 @@ void Game::clean() {
     if (farStars.texture != nullptr) {
         SDL_DestroyTexture(farStars.texture);
         farStars.texture = nullptr;
+    }
+    if (textFont != nullptr) {
+        TTF_CloseFont(textFont);
+        textFont = nullptr;
+    }
+    if (titleFont != nullptr) {
+        TTF_CloseFont(titleFont);
+        titleFont = nullptr;
     }
     IMG_Quit();
     Mix_CloseAudio();
@@ -194,4 +212,21 @@ void Game::renderBackground() {
             SDL_RenderCopy(renderer, nearStars.texture, NULL, &dstrect);
         }
     }
+}
+
+void Game::renderTextCentered(std::string text, float posY, bool isTitle) {
+    SDL_Color color = {255, 255, 255};
+    SDL_Surface *surface;
+    if (isTitle) {
+        surface = TTF_RenderUTF8_Blended(titleFont, text.c_str(), color);
+    }
+    else {
+        surface = TTF_RenderUTF8_Blended(textFont, text.c_str(), color);
+    }
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    int y = static_cast<int>((getWindowHeight() - surface->h) * posY);
+    SDL_Rect rect = {getWindowWidth() / 2 - surface->w / 2, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
 }
