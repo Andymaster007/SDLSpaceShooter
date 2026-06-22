@@ -82,7 +82,7 @@ void SceneMain::init() {
     }
 
     scoreFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 32);
-
+    game.setScore(0);
     gameStart = SDL_GetTicks();
 }
 
@@ -256,6 +256,16 @@ void SceneMain::shootPlayer() {
     projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2;
     projectile->position.y = player.position.y;
     projectilePlayer.push_back(projectile);
+
+    //more lasers
+    projectile = new ProjectilePlayer(projectilePlayerTemplate);
+    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2 + 28;
+    projectile->position.y = player.position.y;
+    projectilePlayer.push_back(projectile);
+    projectile = new ProjectilePlayer(projectilePlayerTemplate);
+    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2 - 28;
+    projectile->position.y = player.position.y;
+    projectilePlayer.push_back(projectile);
     Mix_PlayChannel(0, soundEffects["playerShoot"], 0);
 }
 
@@ -301,12 +311,18 @@ void SceneMain::spawnEnemy() {
     }
     float spawnRate = 1.0;
     if (SDL_GetTicks() - gameStart > 60000) {
+        spawnRate = 3 + (SDL_GetTicks() - gameStart - 60000) / 5000;
+        if (spawnRate > 8) {
+            spawnRate = 8;
+        }
+    }
+    else if (SDL_GetTicks() - gameStart > 45000) {
         spawnRate = 2.5;
     }
-    else if (SDL_GetTicks() - gameStart > 40000) {
+    else if (SDL_GetTicks() - gameStart > 30000) {
         spawnRate = 2.0;
     }
-    else if (SDL_GetTicks() - gameStart > 25000) {
+    else if (SDL_GetTicks() - gameStart > 15000) {
         spawnRate = 1.5;
     }
     if (dis(gen) < spawnRate / 60.0f) {
