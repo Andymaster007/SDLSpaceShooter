@@ -26,6 +26,14 @@ void Game::init() {
         isRunning = false;
     }
 
+    SDL_DisplayMode displayMode;
+    SDL_GetCurrentDisplayMode(0, &displayMode);
+    int screenHeight = displayMode.h;
+
+    windowHeight = static_cast<int>(screenHeight * 0.9f);   // 高度占屏幕 90%
+    windowWidth = windowHeight * 3 / 4;
+    scale = windowHeight / 800.0f;
+
     window = SDL_CreateWindow("SDL Space Shooter", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't create window: %s\n", SDL_GetError());
@@ -61,25 +69,26 @@ void Game::init() {
         isRunning = false;
     }
     SDL_QueryTexture(nearStars.texture, NULL, NULL, &nearStars.width, &nearStars.height);
-    nearStars.width /= 2;
-    nearStars.height /= 2;
+    nearStars.speed = 30 * scale;
+    nearStars.width = nearStars.width / 2 * scale;
+    nearStars.height = nearStars.height / 2 * scale;
     farStars.texture = IMG_LoadTexture(renderer, "assets/image/Stars-B.png");
     if (farStars.texture == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load far star texture %s", SDL_GetError());
         isRunning = false;
     }
     SDL_QueryTexture(farStars.texture, NULL, NULL, &farStars.width, &farStars.height);
-    farStars.speed = 20;
-    farStars.width /= 2;
-    farStars.height /= 2;
+    farStars.speed = 20 * scale;
+    farStars.width = farStars.width / 2 * scale;
+    farStars.height = farStars.height / 2 * scale;
 
     if (TTF_Init() == -1) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't initialize TTF: %s\n", SDL_GetError());
         isRunning = false;
     }
 
-    titleFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 64);
-    textFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 32);
+    titleFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", static_cast<int>(64 * scale));
+    textFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", static_cast<int>(32 * scale));
     if (titleFont == nullptr || textFont == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't load font: %s\n", SDL_GetError());
         isRunning = false;
@@ -188,6 +197,10 @@ int Game::getWindowWidth() {
 
 int Game::getWindowHeight() {
     return windowHeight;
+}
+
+float Game::getScale() {
+    return scale;
 }
 
 void Game::updateBackground(float deltaTime) {

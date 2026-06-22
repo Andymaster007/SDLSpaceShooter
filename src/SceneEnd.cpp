@@ -112,7 +112,7 @@ void SceneEnd::renderScoreboard() {
         std::string name = std::to_string(index) + ". " + item.second;
         game.renderTextPosition(name, posX, posY);
         game.renderTextPosition(score, posX, posY, false);
-        posY += 50;
+        posY += static_cast<int>(50 * game.getScale());
         index++;
     }
     if (newGameTimer < 0.6f) {

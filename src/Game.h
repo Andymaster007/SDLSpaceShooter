@@ -36,6 +36,7 @@ public:
     void setScore(int score);
     std::multimap<int, std::string, std::greater<int>>& getLeaderboard();
     void insertLeaderboard(int score, std::string name);
+    float getScale();
 private:
     Game();
     Game(const Game &) = delete;
@@ -44,8 +45,8 @@ private:
     Scene *currentScene = nullptr;
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
-    int windowWidth = 600;
-    int windowHeight = 800;
+    int windowWidth = 0;
+    int windowHeight = 0;
     int FPS = 60;
     Uint32 expectedFrameTime;
     float deltaTime;
@@ -55,6 +56,7 @@ private:
     TTF_Font *textFont;
     int playerScore = 0;
     std::multimap <int, std::string, std::greater<int>> leaderboard;
+    float scale = 1.0f;
 
     void updateBackground(float deltaTime);
     void renderBackground();

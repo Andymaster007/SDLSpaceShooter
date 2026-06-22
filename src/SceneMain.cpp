@@ -34,8 +34,8 @@ void SceneMain::init() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load player texture %s", SDL_GetError());
     }
     SDL_QueryTexture(player.texture, NULL, NULL, &player.width, &player.height);
-    player.width /= scalingFactor;
-    player.height /= scalingFactor;
+    player.width = player.width / scalingFactor * game.getScale();
+    player.height = player.height / scalingFactor * game.getScale();
     player.position.x = game.getWindowWidth() / 2 - player.width / 2;
     player.position.y = game.getWindowHeight() - player.height;
 
@@ -44,21 +44,21 @@ void SceneMain::init() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load player projectile texture %s", SDL_GetError());
     }
     SDL_QueryTexture(projectilePlayerTemplate.texture, NULL, NULL, &projectilePlayerTemplate.width, &projectilePlayerTemplate.height);
-    projectilePlayerTemplate.width /= scalingFactor;
-    projectilePlayerTemplate.height /= scalingFactor;
+    projectilePlayerTemplate.width = projectilePlayerTemplate.width / scalingFactor * game.getScale();
+    projectilePlayerTemplate.height = projectilePlayerTemplate.height / scalingFactor * game.getScale();
 
     enemyTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/image/insect-2.png");
     SDL_QueryTexture(enemyTemplate.texture, NULL, NULL, &enemyTemplate.width, &enemyTemplate.height);
-    enemyTemplate.width /= scalingFactor;
-    enemyTemplate.height /= scalingFactor;
+    enemyTemplate.width = enemyTemplate.width / scalingFactor * game.getScale();
+    enemyTemplate.height = enemyTemplate.height / scalingFactor * game.getScale();
 
     projectileEnemyTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/image/bullet-1.png");
     if (projectileEnemyTemplate.texture == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load enemy projectile texture %s", SDL_GetError());
     }
     SDL_QueryTexture(projectileEnemyTemplate.texture, NULL, NULL, &projectileEnemyTemplate.width, &projectileEnemyTemplate.height);
-    projectileEnemyTemplate.width /= scalingFactor;
-    projectileEnemyTemplate.height /= scalingFactor;
+    projectileEnemyTemplate.width = projectileEnemyTemplate.width / scalingFactor * game.getScale();
+    projectileEnemyTemplate.height = projectileEnemyTemplate.height / scalingFactor * game.getScale();
 
     explosionTemplate.texture = IMG_LoadTexture(game.getRenderer(), "assets/effect/explosion.png");
     if (explosionTemplate.texture == nullptr) {
@@ -73,15 +73,15 @@ void SceneMain::init() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load life texture %s", SDL_GetError());
     }
     SDL_QueryTexture(itemHealthTemplate.texture, NULL, NULL, &itemHealthTemplate.width, &itemHealthTemplate.height);
-    itemHealthTemplate.width /= scalingFactor;
-    itemHealthTemplate.height /= scalingFactor;
+    itemHealthTemplate.width = itemHealthTemplate.width / scalingFactor * game.getScale();
+    itemHealthTemplate.height = itemHealthTemplate.height / scalingFactor * game.getScale();
 
     uiHealth = IMG_LoadTexture(game.getRenderer(), "assets/image/Health UI Black.png");
     if (uiHealth == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load ui health %s", SDL_GetError());
     }
 
-    scoreFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", 32);
+    scoreFont = TTF_OpenFont("assets/font/VonwaonBitmap-16px.ttf", static_cast<int>(32 * game.getScale()));
     game.setScore(0);
     gameStart = SDL_GetTicks();
 }
@@ -217,16 +217,16 @@ void SceneMain::keyboardControl(float deltaTime) {
     }
     auto keyboardState = SDL_GetKeyboardState(NULL);
     if (keyboardState[SDL_SCANCODE_W]) {
-        player.position.y -= deltaTime * player.speed;
+        player.position.y -= deltaTime * player.speed * game.getScale();
     }
     if (keyboardState[SDL_SCANCODE_S]) {
-        player.position.y += deltaTime * player.speed;
+        player.position.y += deltaTime * player.speed * game.getScale();
     }
     if (keyboardState[SDL_SCANCODE_A]) {
-        player.position.x -= deltaTime * player.speed;
+        player.position.x -= deltaTime * player.speed * game.getScale();
     }
     if (keyboardState[SDL_SCANCODE_D]) {
-        player.position.x += deltaTime * player.speed;
+        player.position.x += deltaTime * player.speed * game.getScale();
     }
 
     if (player.position.x < 0) {
@@ -259,11 +259,11 @@ void SceneMain::shootPlayer() {
 
     //more lasers
     projectile = new ProjectilePlayer(projectilePlayerTemplate);
-    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2 + 28;
+    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2 + static_cast<int>(28 * game.getScale());
     projectile->position.y = player.position.y;
     projectilePlayer.push_back(projectile);
     projectile = new ProjectilePlayer(projectilePlayerTemplate);
-    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2 - 28;
+    projectile->position.x = player.position.x + player.width / 2 - projectile->width / 2 - static_cast<int>(28 * game.getScale());
     projectile->position.y = player.position.y;
     projectilePlayer.push_back(projectile);
     Mix_PlayChannel(0, soundEffects["playerShoot"], 0);
@@ -272,7 +272,7 @@ void SceneMain::shootPlayer() {
 void SceneMain::updatePlayerProjectiles(float deltaTime) {
     for (auto it = projectilePlayer.begin(); it != projectilePlayer.end();) {
         auto projectile = *it;
-        projectile->position.y -= projectile->speed * deltaTime;
+        projectile->position.y -= projectile->speed * deltaTime * game.getScale();
         if (projectile->position.y + projectile->height < 0) {
             delete projectile;
             it = projectilePlayer.erase(it);
@@ -337,7 +337,7 @@ void SceneMain::updateEnemies(float deltaTime) {
     auto currentTime = SDL_GetTicks();
     for (auto it = enemies.begin(); it != enemies.end();) {
         auto enemy = *it;
-        enemy->position.y += enemy->speed * deltaTime;
+        enemy->position.y += enemy->speed * deltaTime * game.getScale();
         if (enemy->position.y > game.getWindowHeight()) {
             delete enemy;
             it = enemies.erase(it);
@@ -389,8 +389,8 @@ SDL_FPoint SceneMain::getDirection(Enemy *enemy) {
 void SceneMain::updateEnemyProjectiles(float deltaTime) {
     for (auto it = projectileEnemies.begin(); it != projectileEnemies.end();) {
         auto projectile = *it;
-        projectile->position.x += projectile->speed * projectile->direction.x * deltaTime;
-        projectile->position.y += projectile->speed * projectile->direction.y * deltaTime;
+        projectile->position.x += projectile->speed * projectile->direction.x * deltaTime * game.getScale();
+        projectile->position.y += projectile->speed * projectile->direction.y * deltaTime * game.getScale();
         if (projectile->position.y > game.getWindowHeight() || projectile->position.y + projectile->height < 0 || projectile->position.x + projectile->width < 0 || projectile->position.x > game.getWindowWidth()) {
             delete projectile;
             it = projectileEnemies.erase(it);
@@ -424,7 +424,7 @@ void SceneMain::enemyExplode(Enemy *enemy) {
     auto currentTime = SDL_GetTicks();
     auto explosion = new Explosion(explosionTemplate);
     explosion->position.x = enemy->position.x + enemy->width / 2 - explosion->width / 2;
-    explosion->position.y = enemy->position.y + enemy->height / 2 - explosion->height / 2 + 15;
+    explosion->position.y = enemy->position.y + enemy->height / 2 - explosion->height / 2 + static_cast<int>(15 * game.getScale());
     explosion->startTime = currentTime;
     explosions.push_back(explosion);
     Mix_PlayChannel(-1, soundEffects["enemyExplode"], 0);
@@ -443,7 +443,7 @@ void SceneMain::updatePlayer() {
         auto currentTime = SDL_GetTicks();
         auto explosion = new Explosion(explosionTemplate);
         explosion->position.x = player.position.x + player.width / 2 - explosion->width / 2;
-        explosion->position.y = player.position.y + player.height / 2 - explosion->height / 2 + 3;
+        explosion->position.y = player.position.y + player.height / 2 - explosion->height / 2 + static_cast<int>(3 * game.getScale());
         explosion->startTime = currentTime;
         explosions.push_back(explosion);
         Mix_PlayChannel(-1, soundEffects["playerExplode"], 0);
@@ -486,7 +486,7 @@ void SceneMain::renderExplosions() {
 void SceneMain::dropItem(Enemy *enemy) {
     auto item = new Item(itemHealthTemplate);
     item->position.x = enemy->position.x + enemy->width / 2 - item->width / 2;
-    item->position.y = enemy->position.y + enemy->height / 2 - item->height / 2 + 15;
+    item->position.y = enemy->position.y + enemy->height / 2 - item->height / 2 + static_cast<int>(15 * game.getScale());
     float angle = dis(gen) * 2 * PI;
     item->direction.x = std::cos(angle);
     item->direction.y = std::sin(angle);
@@ -496,8 +496,8 @@ void SceneMain::dropItem(Enemy *enemy) {
 void SceneMain::updateItems(float deltaTime) {
     for (auto it = items.begin(); it != items.end();) {
         auto item = *it;
-        item->position.x += item->direction.x * item->speed * deltaTime;
-        item->position.y += item->direction.y * item->speed * deltaTime;
+        item->position.x += item->direction.x * item->speed * deltaTime * game.getScale();
+        item->position.y += item->direction.y * item->speed * deltaTime * game.getScale();
         if (item->position.x < 0 && item->bounce > 0) {
             item->direction.x = -item->direction.x;
             item->bounce--;
@@ -550,10 +550,11 @@ void SceneMain::renderItems() {
 }
 
 void SceneMain::renderUI() {
-    int x = 15;
-    int y = 15;
-    int size = 48;
-    int offset = 60;
+    float s = game.getScale();
+    int x = static_cast<int>(15 * s);
+    int y = static_cast<int>(15 * s);
+    int size = static_cast<int>(48 * s);
+    int offset = static_cast<int>(60 * s);
     SDL_SetTextureColorMod(uiHealth, 100, 100, 100);
     for (int i = 0; i < player.maxHealth; i++) {
         SDL_Rect rect = {x + i * offset, y, size, size};
@@ -569,7 +570,7 @@ void SceneMain::renderUI() {
     SDL_Color scoreColor = {255, 255, 255};
     SDL_Surface *scoreSurface = TTF_RenderUTF8_Blended(scoreFont, scoreTxt.c_str(), scoreColor);
     SDL_Texture *scoreTexture = SDL_CreateTextureFromSurface(game.getRenderer(), scoreSurface);
-    SDL_Rect scoreRect = {game.getWindowWidth() - scoreSurface->w - 25, 23, scoreSurface->w, scoreSurface->h};
+    SDL_Rect scoreRect = {game.getWindowWidth() - scoreSurface->w - static_cast<int>(25 * s), static_cast<int>(23 * s), scoreSurface->w, scoreSurface->h};
     SDL_RenderCopy(game.getRenderer(), scoreTexture, NULL, &scoreRect);
     SDL_FreeSurface(scoreSurface);
     SDL_DestroyTexture(scoreTexture);
