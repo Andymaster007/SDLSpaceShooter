@@ -7,6 +7,7 @@
 
 #include "Scene.h"
 #include <string>
+#include <SDL_mixer.h>
 
 class SceneEnd: public Scene {
 public:
@@ -16,6 +17,7 @@ public:
     void init() override;
     void clean() override;
 private:
+    Mix_Music *music;
     bool isTyping = true;
     std::string userName;
     float underlineBlinkTimer = 0.0f;

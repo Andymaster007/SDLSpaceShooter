@@ -8,6 +8,12 @@
 #include <string>
 
 void SceneEnd::init() {
+    music = Mix_LoadMUS("assets/music/06_Battle_in_Space_Intro.ogg");
+    if (music == nullptr) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to load background music %s", SDL_GetError());
+    }
+    Mix_PlayMusic(music, -1);
+
     if (!SDL_IsTextInputActive()) {
         SDL_StartTextInput();
         if (!SDL_IsTextInputActive()) {
@@ -66,7 +72,11 @@ void SceneEnd::handleEvent(SDL_Event *event) {
 }
 
 void SceneEnd::clean() {
-
+    if (music != nullptr) {
+        Mix_HaltMusic();
+        Mix_FreeMusic(music);
+        music = nullptr;
+    }
 }
 
 void SceneEnd::renderNameInput() {
