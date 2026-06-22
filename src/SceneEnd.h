@@ -19,11 +19,11 @@ private:
     bool isTyping = true;
     std::string userName;
     float underlineBlinkTimer = 0.0f;
+    float newGameTimer = 0.0f;
 
     void renderScoreboard();
     void renderNameInput();
     void deleteLastUTF8Character(std::string &str);
 };
-
 
 #endif //SDLSPACESHOOTER_SCENEEND_H

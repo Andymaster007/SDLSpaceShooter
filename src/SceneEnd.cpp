@@ -3,6 +3,7 @@
 //
 
 #include "SceneEnd.h"
+#include "SceneMain.h"
 #include "Game.h"
 #include <string>
 
@@ -19,6 +20,10 @@ void SceneEnd::update(float deltaTime) {
     underlineBlinkTimer += deltaTime;
     if (underlineBlinkTimer >= 1.0f) {
         underlineBlinkTimer -= 1.0f;
+    }
+    newGameTimer += deltaTime;
+    if (newGameTimer >= 1.2f) {
+        newGameTimer -= 1.2f;
     }
 }
 
@@ -37,6 +42,10 @@ void SceneEnd::handleEvent(SDL_Event *event) {
             if (event->key.keysym.scancode == SDL_SCANCODE_RETURN) {
                 isTyping = false;
                 SDL_StopTextInput();
+                if (userName.empty()) {
+                    userName = "unnamed";
+                }
+                game.insertLeaderboard(game.getScore(), userName);
             }
             if (event->key.keysym.scancode == SDL_SCANCODE_BACKSPACE && !userName.empty()) {
                 deleteLastUTF8Character(userName);
@@ -44,6 +53,14 @@ void SceneEnd::handleEvent(SDL_Event *event) {
         }
         if (event->type == SDL_TEXTINPUT) {
             userName += event->text.text;
+        }
+    }
+    else {
+        if (event->type == SDL_KEYDOWN) {
+            if (event->key.keysym.scancode == SDL_SCANCODE_SPACE) {
+                auto SceneMain = new ::SceneMain;
+                game.changeScene(SceneMain);
+            }
         }
     }
 }
@@ -76,7 +93,21 @@ void SceneEnd::renderNameInput() {
 }
 
 void SceneEnd::renderScoreboard() {
-
+    game.renderTextCentered("Leaderboard", 0.1, true);
+    int index = 1;
+    float posY = 0.2 * game.getWindowHeight();
+    float posX = 0.15 * game.getWindowWidth();
+    for (auto item: game.getLeaderboard()) {
+        std::string score = std::to_string(item.first);
+        std::string name = std::to_string(index) + ". " + item.second;
+        game.renderTextPosition(name, posX, posY);
+        game.renderTextPosition(score, posX, posY, false);
+        posY += 50;
+        index++;
+    }
+    if (newGameTimer < 0.6f) {
+        game.renderTextCentered("Press SPACE to Start Again", 0.8, false);
+    }
 }
 
 void SceneEnd::deleteLastUTF8Character(std::string &str) {

@@ -240,12 +240,33 @@ int Game::getScore() {
     return playerScore;
 }
 
-void Game::renderTextPosition(const std::string& text, int posX, int posY) {
+void Game::renderTextPosition(const std::string& text, int posX, int posY, bool isLeft) {
     SDL_Color color = {255, 255, 255};
     SDL_Surface *surface = TTF_RenderUTF8_Blended(textFont, text.c_str(), color);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_Rect rect = {posX, posY, surface->w, surface->h};
+    SDL_Rect rect;
+    if (isLeft) {
+        rect = {posX, posY, surface->w, surface->h};
+    }
+    else {
+        rect = {getWindowWidth() - posX - surface->w, posY, surface->w, surface->h};
+    }
     SDL_RenderCopy(renderer, texture, NULL, &rect);
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(surface);
+}
+
+std::multimap<int, std::string, std::greater<int>>& Game::getLeaderboard() {
+    return leaderboard;
+}
+
+void Game::insertLeaderboard(int score, std::string name) {
+    leaderboard.insert({score, name});
+    if (leaderboard.size() > 8) {
+        leaderboard.erase(std::prev(leaderboard.end()));
+    }
+}
+
+void Game::setScore(int score) {
+    playerScore = score;
 }
