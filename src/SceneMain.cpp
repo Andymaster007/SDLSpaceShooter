@@ -5,6 +5,7 @@
 #include <iostream>
 #include "SceneMain.h"
 #include "SceneTitle.h"
+#include "SceneEnd.h"
 #include "Game.h"
 #include <SDL_image.h>
 #include <cmath>
@@ -205,6 +206,9 @@ void SceneMain::update(float deltaTime) {
     updatePlayer();
     updateExplosions();
     updateItems(deltaTime);
+    if (isDead) {
+        changeSceneDelay(deltaTime);
+    }
 }
 
 void SceneMain::keyboardControl(float deltaTime) {
@@ -328,7 +332,7 @@ void SceneMain::updateEnemies(float deltaTime) {
                 enemy->lastShootTime = currentTime;
             }
             if (enemy->health <= 0) {
-                player.score += 10;
+                game.setScoreAdd(10);
                 enemyExplode(enemy);
                 it = enemies.erase(it);
             }
@@ -545,7 +549,7 @@ void SceneMain::renderUI() {
         SDL_RenderCopy(game.getRenderer(), uiHealth, NULL, &rect);
     }
 
-    auto scoreTxt = "Score: " + std::to_string(player.score);
+    auto scoreTxt = "Score: " + std::to_string(game.getScore());
     SDL_Color scoreColor = {255, 255, 255};
     SDL_Surface *scoreSurface = TTF_RenderUTF8_Blended(scoreFont, scoreTxt.c_str(), scoreColor);
     SDL_Texture *scoreTexture = SDL_CreateTextureFromSurface(game.getRenderer(), scoreSurface);
@@ -553,4 +557,12 @@ void SceneMain::renderUI() {
     SDL_RenderCopy(game.getRenderer(), scoreTexture, NULL, &scoreRect);
     SDL_FreeSurface(scoreSurface);
     SDL_DestroyTexture(scoreTexture);
+}
+
+void SceneMain::changeSceneDelay(float deltaTime) {
+    gameEnd += deltaTime;
+    if (gameEnd >= 3) {
+        auto sceneEnd = new SceneEnd();
+        game.changeScene(sceneEnd);
+    }
 }

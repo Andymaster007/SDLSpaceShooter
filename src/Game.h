@@ -30,7 +30,10 @@ public:
     int getWindowHeight();
     void updateBackground(float deltaTime);
     void renderBackground();
-    void renderTextCentered(std::string text, float posY, bool isTitle);
+    SDL_Point renderTextCentered(const std::string& text, float posY, bool isTitle);
+    void renderTextPosition(const std::string& text, int posX, int posY);
+    int getScore();
+    void setScoreAdd(int score);
 
 private:
     Game();
@@ -49,8 +52,7 @@ private:
     Background farStars;
     TTF_Font *titleFont;
     TTF_Font *textFont;
+    int playerScore = 0;
 };
-
-
 
 #endif //SDLSPACESHOOTER_GAME_H

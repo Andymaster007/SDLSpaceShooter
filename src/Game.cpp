@@ -214,7 +214,7 @@ void Game::renderBackground() {
     }
 }
 
-void Game::renderTextCentered(std::string text, float posY, bool isTitle) {
+SDL_Point Game::renderTextCentered(const std::string& text, float posY, bool isTitle) {
     SDL_Color color = {255, 255, 255};
     SDL_Surface *surface;
     if (isTitle) {
@@ -226,6 +226,25 @@ void Game::renderTextCentered(std::string text, float posY, bool isTitle) {
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     int y = static_cast<int>((getWindowHeight() - surface->h) * posY);
     SDL_Rect rect = {getWindowWidth() / 2 - surface->w / 2, y, surface->w, surface->h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+    return {rect.x + rect.w, y};
+}
+
+void Game::setScoreAdd(int score) {
+    playerScore += score;
+}
+
+int Game::getScore() {
+    return playerScore;
+}
+
+void Game::renderTextPosition(const std::string& text, int posX, int posY) {
+    SDL_Color color = {255, 255, 255};
+    SDL_Surface *surface = TTF_RenderUTF8_Blended(textFont, text.c_str(), color);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_Rect rect = {posX, posY, surface->w, surface->h};
     SDL_RenderCopy(renderer, texture, NULL, &rect);
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(surface);

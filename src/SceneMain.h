@@ -47,6 +47,7 @@ private:
     int scalingFactor = 4;
     bool isDead = false;
     Uint32 gameStart = 0;
+    float gameEnd = 0.0f;
 
     void keyboardControl(float deltaTime);
     void shootPlayer();
@@ -68,6 +69,7 @@ private:
     void playerGetItem(Item *item);
     void renderItems();
     void renderUI();
+    void changeSceneDelay(float deltaTime);
 };
 
 #endif //SDLSPACESHOOTER_SCENEMAIN_H
