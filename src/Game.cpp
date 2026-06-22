@@ -9,6 +9,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
+#include <fstream>
 
 Game::Game() {
 
@@ -83,6 +84,8 @@ void Game::init() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Couldn't load font: %s\n", SDL_GetError());
         isRunning = false;
     }
+
+    loadData();
 
     currentScene = new SceneTitle();
     currentScene->init();
@@ -165,6 +168,7 @@ void Game::handleEvent(SDL_Event *event) {
     while (SDL_PollEvent(event)) {
         if (event->type == SDL_QUIT) {
             isRunning = false;
+            saveData();
         }
         currentScene->handleEvent(event);
     }
@@ -269,4 +273,34 @@ void Game::insertLeaderboard(int score, std::string name) {
 
 void Game::setScore(int score) {
     playerScore = score;
+}
+
+void Game::loadData() {
+    char *path = SDL_GetPrefPath("SDLSpaceShooter", "SDLSpaceShooter");
+    std::string filePath = std::string(path) + "leaderboard.txt";
+    SDL_free(path);
+
+    std::ifstream file(filePath);
+    if (file.is_open()) {
+        int score;
+        std::string name;
+        while (file >> score >> name) {
+            leaderboard.insert({score, name});
+        }
+        file.close();
+    }
+}
+
+void Game::saveData() {
+    char *path = SDL_GetPrefPath("SDLSpaceShooter", "SDLSpaceShooter");
+    std::string filePath = std::string(path) + "leaderboard.txt";
+    SDL_free(path);
+
+    std::ofstream file(filePath);
+    if (file.is_open()) {
+        for (auto &entry : leaderboard) {
+            file << entry.first << " " << entry.second << "\n";
+        }
+        file.close();
+    }
 }

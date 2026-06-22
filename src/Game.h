@@ -58,6 +58,8 @@ private:
 
     void updateBackground(float deltaTime);
     void renderBackground();
+    void loadData();
+    void saveData();
 };
 
 #endif //SDLSPACESHOOTER_GAME_H
